@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="WebRTC code samples">
+  <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
+  <meta itemprop="description" content="Client-side WebRTC code samples">
+  <meta itemprop="name" content="WebRTC code samples">
+  <meta name="mobile-web-app-capable" content="yes">
+  <base target="_blank">
+  <script>
+    document.addEventListener('touchmove',function(e){e.preventDefault()},{ passive: false })
+  </script>
+  <title>飘雪webAR2</title>
+  <style>
+    *{margin:0;padding:0}
+    
+    video{
+      position:absolute;
+    }
+    body,html{
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+
+    .zmiti-box{
+      position: absolute;
+      z-index: 10;
+      color:#fff;
+      left: 40%;
+      top: 50%;
+    }
+  #gum-local{
+    position: absolute;
+    left: 40%;
+    top: 50%;
+    width: 100%;
+    height: 100%;
+    -webkit-transform-origin: center 80%;
+    -webkit-transform:translate(-50%,-50%) scale(1.2);
+  }
+
+  .zmiti-video-box{
+    position: relative;
+    left: 0;top:0;
+    z-index: 1
+  }
+  canvas{
+    position: absolute;
+    left: 0;top: 0;
+    z-index: 100;
+  }
+  </style>
+  
+
+</head>
+
+<body>
+
+   <div class="zmiti-video-box">
+      <video id="gum-local" autoplay playsinline></video>
+   </div>
+
+<script src="https://cdn.bootcss.com/three.js/r83/three.min.js"></script>
+<script src='./js/OBJLoader.js'></script>
+<script src='./js/TrackballControls.js'></script>
+  <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+<script>
+  var zmitiUtil = {
+
+    init: function() { 
+
+       if (navigator.mediaDevices === undefined) {
+            navigator.mediaDevices = {};
+        }
+        if (navigator.mediaDevices.getUserMedia === undefined) {
+            navigator.mediaDevices.getUserMedia = function(constraints) {
+                var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+                if (!getUserMedia) {
+                    return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+                }
+                return new Promise(function(resolve, reject) {
+                    getUserMedia.call(navigator, constraints, resolve, reject);
+                });
+            }
+        }
+        window.URL = (window.URL || window.webkitURL || window.mozURL || window.msURL);
+      
+      
+        this.initWebRTC();
+    },     
+    initWebRTC: function() {
+        ///var errorElement = document.querySelector('#errorMsg');
+        var video = document.querySelector('video');
+      
+       navigator.getUserMedia({ audio: true, video: { width: 1280, height: 720 } },
+      function(stream) {
+         var video = document.querySelector('video');
+         video.src = window.URL.createObjectURL(stream);  
+            video.play();
+      },
+      function(err) {
+         alert(err.name);
+         console.log("出错信息: " + err.name);
+      }
+   );
+
+      
+      return ;
+        if (navigator.getUserMedia) {
+            navigator.mediaDevices.enumerateDevices().then(function(sourceInfos) {
+ 
+                var constraints = window.constraints = {
+                    audio: false,
+                    video: {
+                        facingMode: 'environment'
+                    }
+                };
+
+                function handleSuccess(stream) {
+                  alert('success');
+                    var videoTracks = stream.getVideoTracks();
+                    //console.log('Got stream with constraints:', constraints);
+                    //console.log('Using video device: ' + videoTracks[0].label);
+                    stream.oninactive = function() {
+                        console.log('Stream inactive');
+                    };
+                    window.stream = stream; // make variable available to browser console
+                    video.srcObject = stream;
+                    
+
+                }
+
+                function handleError(error) {
+                    
+                    /* if (error.name === 'ConstraintNotSatisfiedError') {
+                         errorMsg('The resolution ' + constraints.video.width.exact + 'x' +
+                             constraints.video.width.exact + ' px is not supported by your device.');
+                     } else if (error.name === 'PermissionDeniedError') {
+                         errorMsg('Permissions have not been granted to use your camera and ' +
+                             'microphone, you need to allow the page access to your devices in ' +
+                             'order for the demo to work.');
+                     }
+                     errorMsg('getUserMedia error: ' + error.name, error);*/
+                }
+
+                function errorMsg(msg, error) {
+                  alert('error');
+                    // errorElement.innerHTML += '<p>' + msg + '</p>';
+                    if (typeof error !== 'undefined') {
+                        console.error(error);
+                    }
+                }
+
+                navigator.mediaDevices.getUserMedia(constraints).
+                then(handleSuccess).catch(handleError);
+            });
+        }
+    }
+
+};
+
+zmitiUtil.init();  
+</script>
+
+
+
+
+
+
+<script>
+/*   function loadScript(src){
+    var script  = document.createElement('script');
+    script.src = src+'?aa='+new Date().getTime();
+    document.body.appendChild(script);
+  }
+
+  loadScript('./js/index.js')
+ 
+  loadScript('./assets/js/vendor.js')*/
+</script>
+<!-- 
+<script src='./assets/js/vendor.js'></script>
+<script src='./assets/js/index.js'></script> -->
+
+<!-- <script src='http://localhost:4013/index.js' onerror="
+"></script> -->
+
+</body>
+</html>
